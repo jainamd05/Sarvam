@@ -13,7 +13,7 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import {
   ElysiaSettings,
-  GEMINI_VOICES,
+  SARVAM_VOICES,
 } from "../lib/settingsStore";
 
 interface SettingsPanelProps {
@@ -277,8 +277,8 @@ export function SettingsPanel({ isOpen, onClose, settings, onChange, onVoiceChan
                         <label className="block text-xs font-mono tracking-widest text-cyan-500 uppercase">Hologram Archetype</label>
                         <div className="grid grid-cols-2 gap-4">
                           {[
-                            { id: "character", label: "Anime Entity", voice: "Aoede", desc: "Video Assets" },
-                            { id: "orb", label: "Aegis Orb", voice: "Charon", desc: "Live API Mesh" }
+                            { id: "character", label: "Anime Entity", voice: "priya", desc: "Video Assets" },
+                            { id: "orb", label: "Aegis Orb", voice: "shubh", desc: "Sarvam Voice" }
                           ].map((a) => (
                             <button
                               key={a.id}
@@ -305,7 +305,7 @@ export function SettingsPanel({ isOpen, onClose, settings, onChange, onVoiceChan
                       <div className="space-y-3">
                         <label className="block text-xs font-mono tracking-widest text-cyan-500 uppercase">Neural Voice Pattern</label>
                         <div className="grid grid-cols-2 gap-3">
-                          {GEMINI_VOICES.map((v) => (
+                          {SARVAM_VOICES.map((v) => (
                             <button
                               key={v.id}
                               onClick={() => { onChange({ voice: v.id }); onVoiceChange?.(v.id); }}
@@ -436,7 +436,7 @@ export function SettingsPanel({ isOpen, onClose, settings, onChange, onVoiceChan
                           </div>
                           <div className="flex justify-between items-center border-b border-cyan-900/50 pb-2">
                             <span className="text-[10px] font-mono text-cyan-700 uppercase tracking-widest">LLM Core</span>
-                            <span className="text-xs font-mono text-cyan-300">Gemini Live API</span>
+                            <span className="text-xs font-mono text-cyan-300">Sarvam (Saaras + Bulbul)</span>
                           </div>
                           <div className="flex justify-between items-center border-b border-cyan-900/50 pb-2 md:border-0 md:pb-0">
                             <span className="text-[10px] font-mono text-cyan-700 uppercase tracking-widest">Daemon</span>

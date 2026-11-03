@@ -23,7 +23,7 @@ export interface ElysiaSettings {
   sensitivity: number;
   /** Master toggle for UI animations. */
   animations: boolean;
-  /** Selected Gemini Live voice name. */
+  /** Selected Sarvam Bulbul speaker. */
   voice: string;
   /** Selected background video filename. */
   backgroundVideo: string;
@@ -31,14 +31,13 @@ export interface ElysiaSettings {
   avatarStyle: "character" | "orb";
 }
 
-export const GEMINI_VOICES = [
-  { id: "Aoede", label: "Aoede (Default)", desc: "Warm and natural" },
-  { id: "Charon", label: "Charon", desc: "Deep and authoritative" },
-  { id: "Fenrir", label: "Fenrir", desc: "Bold and confident" },
-  { id: "Kore", label: "Kore", desc: "Soft and gentle" },
-  { id: "Leda", label: "Leda", desc: "Calm and composed" },
-  { id: "Puck", label: "Puck", desc: "Energetic and playful" },
-  { id: "Zephyr", label: "Zephyr", desc: "Light and breezy" },
+export const SARVAM_VOICES = [
+  { id: "shubh", label: "Shubh (Default)", desc: "Bulbul male voice" },
+  { id: "priya", label: "Priya", desc: "Bulbul female voice" },
+  { id: "aditya", label: "Aditya", desc: "Bulbul male voice" },
+  { id: "neha", label: "Neha", desc: "Bulbul female voice" },
+  { id: "rahul", label: "Rahul", desc: "Bulbul male voice" },
+  { id: "kavya", label: "Kavya", desc: "Bulbul female voice" },
 ] as const;
 
 export const DEFAULT_SETTINGS: ElysiaSettings = {
@@ -48,7 +47,7 @@ export const DEFAULT_SETTINGS: ElysiaSettings = {
   micDeviceId: "",
   sensitivity: 60,
   animations: true,
-  voice: "Charon",
+  voice: "shubh",
   backgroundVideo: "solid",
   avatarStyle: "orb",
 };

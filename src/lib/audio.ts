@@ -279,8 +279,8 @@ export class ElysiaAudioSession {
           // Handle server-side states
           if (data.type === "status") {
             console.log("[Elysia WS Status]:", data.status);
-            if (data.status === "connecting_gemini") {
-              // Wait for Gemini Live connection
+            if (data.status === "connecting_sarvam") {
+              // Wait for Sarvam connection
             } else if (data.status === "connected") {
               this.setState("listening");
             } else if (data.status === "session_closed") {
@@ -402,7 +402,7 @@ export class ElysiaAudioSession {
       const uint8Array = base64ToUint8Array(base64Audio);
       const floats = pcm16ToFloats(uint8Array);
 
-      // Create AudioBuffer of 24000Hz (the exact playback sample rate of Gemini outputs)
+      // Create AudioBuffer of 24000Hz (the exact sample rate requested from Sarvam Bulbul)
       const buffer = this.outputAudioCtx.createBuffer(1, floats.length, 24000);
       buffer.getChannelData(0).set(floats);
 

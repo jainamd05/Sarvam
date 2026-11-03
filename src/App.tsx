@@ -97,7 +97,7 @@ export default function App() {
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      // Restrict maximum resolution size to keep payload light for Gemini Live
+      // Restrict maximum resolution size to keep payload light for Sarvam
       const maxDim = 960;
       let width = video.videoWidth;
       let height = video.videoHeight;
@@ -953,7 +953,7 @@ export default function App() {
             <div className="pt-2 border-t border-white/5 flex items-center justify-between text-left">
               <div className="flex flex-col">
                 <span className="text-[10px] font-bold font-mono text-slate-200">SCREEN VISION MODE</span>
-                <span className="text-[8px] text-slate-400 uppercase font-mono max-w-[150px]">Gemini Auto-Analysis</span>
+                <span className="text-[8px] text-slate-400 uppercase font-mono max-w-[150px]">Sarvam Auto-Analysis</span>
               </div>
               <button
                 onClick={() => setScreenVisionMode(!screenVisionMode)}

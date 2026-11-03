@@ -4,7 +4,11 @@
   <video src="https://github.com/SarangRao20/Elysia-AI/raw/main/demo.mp4" controls="controls" muted="muted" autoplay="autoplay" width="100%"></video>
 </div>
 
-A real-time, voice-to-voice holographic AI companion desktop assistant built on the **Google Gemini Live API**. ELYSIA combines a holographic video character, persistent memory, a reminder system, a full desktop automation agent, and an in-app browser — all running locally with a 3-process architecture.
+> **Voice and AI now run on [Sarvam](https://www.sarvam.ai): Saaras (speech to text), Bulbul (text to speech) and Sarvam chat completions, replacing Gemini Live. Set `SARVAM_API_KEY` in `.env`. Some sections below still describe the earlier Gemini setup.**
+>
+> Based on [Elysia-AI](https://github.com/SarangRao20/Elysia-AI) by Sarang Gajanan Rao, used with written permission. See [LICENSE](LICENSE).
+
+A real-time, voice-to-voice holographic AI companion desktop assistant. ELYSIA combines a holographic video character, persistent memory, a reminder system, a full desktop automation agent, and an in-app browser — all running locally with a 3-process architecture.
 
 ---
 

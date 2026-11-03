@@ -3,7 +3,7 @@
  *
  * ELYSIA ships without any API key. On launch we ask the backend whether a key
  * is configured (GET /api/config). If not, this full-screen overlay blocks the
- * app until the user pastes their own Google Gemini key, which the backend
+ * app until the user pastes their own Sarvam key, which the backend
  * validates with a live test call and stores in their per-user data folder.
  *
  * The key never touches localStorage and is never sent back to the frontend.
@@ -85,20 +85,20 @@ export function ApiKeyGate({ children }: { children: ReactNode }) {
             </div>
             <h1 className="text-xl font-semibold tracking-tight">Welcome to ELYSIA</h1>
             <p className="mt-2 text-sm leading-relaxed text-white/55">
-              ELYSIA runs on your own Google Gemini API key. Paste it below to get
+              ELYSIA runs on your own Sarvam API key. Paste it below to get
               started — it stays on this computer and is never shared.
             </p>
           </div>
 
           <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-white/40">
-            Gemini API key
+            Sarvam API key
           </label>
           <input
             type="password"
             autoFocus
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            placeholder="AIza…"
+            placeholder="Your Sarvam key"
             spellCheck={false}
             className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-400/60 focus:ring-2 focus:ring-indigo-500/20"
           />
@@ -128,7 +128,7 @@ export function ApiKeyGate({ children }: { children: ReactNode }) {
               <ShieldCheck className="h-3.5 w-3.5" /> Stored locally only
             </span>
             <a
-              href="https://aistudio.google.com/app/apikey"
+              href="https://dashboard.sarvam.ai"
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-1 text-indigo-300 transition hover:text-indigo-200"
