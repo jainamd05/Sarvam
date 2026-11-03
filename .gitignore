@@ -1,0 +1,62 @@
+node_modules/
+dist/
+venv/
+__pycache__/
+*.pyc
+.env
+.env*.local
+logs/
+.gemini/
+WhatsApp*
+memories.json
+settings.json
+secrets.json
+reminders.json
+metadata.json
+
+# IDE and Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-workspace
+*.sublime-project
+
+# Development
+.vite/
+*.tsbuildinfo
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Data directory (per-user, should not be committed)
+.data/
+~/.elysia/
+
+# Temporary files
+*.tmp
+temp/
+.tmp/
+*.log.old
+
+# Test artifacts
+test-results/
+coverage/
+
+# Playwright artifacts
+test-results/
+.playwright/
+
+# Python
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# OS
+Thumbs.db
+.DS_Store
+
