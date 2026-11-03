@@ -2,7 +2,7 @@ import express from "express";
 import http from "http";
 import path from "path";
 import { WebSocketServer } from "ws";
-import { GoogleGenAI, Modality, Type, LiveServerMessage } from "@google/genai";
+import { SarvamLiveClient, Type, LiveServerMessage, sarvamChatModel, validateSarvamKey } from "./sarvam";
 import dotenv from "dotenv";
 import * as fs from "fs";
 import { 
@@ -24,9 +24,9 @@ import { Reminder } from "../lib/reminderTypes";
 import {
   DATA_DIR,
   dataFile,
-  getGeminiApiKey,
-  hasGeminiApiKey,
-  setGeminiApiKey,
+  getSarvamApiKey,
+  hasSarvamApiKey,
+  setSarvamApiKey,
 } from "./paths";
 
 dotenv.config();
@@ -419,11 +419,11 @@ async function startServer() {
 
   // ---------------------------------------------------------------------------
   // Config / API-key onboarding.
-  // The Gemini key is never shipped; each user supplies their own on first run.
+  // The Sarvam key is never shipped; each user supplies their own on first run.
   // GET reports only whether a key exists — the key itself is never returned.
   // ---------------------------------------------------------------------------
   app.get("/api/config", (_req, res) => {
-    res.json({ hasApiKey: hasGeminiApiKey() });
+    res.json({ hasApiKey: hasSarvamApiKey() });
   });
 
   app.post("/api/config/apikey", async (req, res) => {
@@ -432,28 +432,21 @@ async function startServer() {
       if (!key) {
         return res.status(400).json({ error: "API key is required." });
       }
-      // Validate the key by listing models — this checks authentication only,
-      // without depending on any single model's availability or per-model
-      // quota (a 429 on one model must NOT read as an invalid key). We only
-      // reject on genuine auth failures; transient/network errors still save,
-      // since the live connection will surface any real problem later.
+      // Only a genuine auth failure rejects the key. Transient/network errors
+      // still save, since the live connection will surface any real problem.
       try {
-        const test = new GoogleGenAI({ apiKey: key });
-        const pager = await test.models.list();
-        await pager[Symbol.asyncIterator]().next(); // force the first request
+        await validateSarvamKey(key);
       } catch (e: any) {
         const msg = String(e?.message || e);
-        const isAuthError =
-          /API[_ ]?KEY|PERMISSION_DENIED|UNAUTHENTICATED|invalid|401|403/i.test(msg);
-        if (isAuthError) {
-          logError(`APIKEY_VALIDATION_REJECTED: ${msg}`);
+        if (msg === "INVALID_SARVAM_KEY") {
+          logError("APIKEY_VALIDATION_REJECTED");
           return res.status(400).json({
-            error: "That key was rejected by Google. Check it and try again.",
+            error: "That key was rejected by Sarvam. Check it and try again.",
           });
         }
         logError(`APIKEY_VALIDATION_SOFT_FAIL (saving anyway): ${msg}`);
       }
-      setGeminiApiKey(key);
+      setSarvamApiKey(key);
       logCommand("APIKEY_SAVED");
       res.json({ ok: true, hasApiKey: true });
     } catch (e: any) {
@@ -830,7 +823,7 @@ async function startServer() {
   wss.on("connection", async (clientWs, req) => {
     console.log("Client WebSocket connected to /live");
     connectedClients.add(clientWs);
-    const apiKey = getGeminiApiKey();
+    const apiKey = getSarvamApiKey();
 
     // Read voice selection from query param (default: Luna)
     const reqUrl = new URL(req.url || "", `http://${req.headers.host}`);
@@ -838,26 +831,19 @@ async function startServer() {
     const avatarStyle = reqUrl.searchParams.get("avatarStyle") || "character";
 
     if (!apiKey) {
-      console.error("No Gemini API key configured.");
+      console.error("No Sarvam API key configured.");
       clientWs.send(JSON.stringify({
         type: "error",
-        error: "NO_API_KEY: Add your Gemini API key in Settings to start talking to ELYSIA."
+        error: "NO_API_KEY: Add your Sarvam API key in Settings to start talking to ELYSIA."
       }));
       clientWs.close();
       return;
     }
     
     try {
-      const ai = new GoogleGenAI({
-        apiKey: apiKey,
-        httpOptions: {
-          headers: {
-            'User-Agent': 'aistudio-build',
-          }
-        }
-      });
+      const ai = new SarvamLiveClient(apiKey);
       
-      clientWs.send(JSON.stringify({ type: "status", status: "connecting_gemini" }));
+      clientWs.send(JSON.stringify({ type: "status", status: "connecting_sarvam" }));
 
       // Load persistent recollections card
       const memories = await loadMemories();
@@ -972,13 +958,12 @@ async function startServer() {
       let dialogueHistory: { role: string; text: string }[] = [];
       let currentModelResponseText = "";
       
-      console.log("[Gemini Connect] Attempting to establish Live session...");
-      console.log(`[Gemini Connect] Using voice: ${voiceName}, avatar: ${avatarStyle}`);
+      console.log("[Sarvam Connect] Attempting to establish Live session...");
+      console.log(`[Sarvam Connect] Using voice: ${voiceName}, avatar: ${avatarStyle}`);
       
       const session = await ai.live.connect({
-        model: "gemini-3.1-flash-live-preview",
+        model: sarvamChatModel(),
         config: {
-          responseModalities: [Modality.AUDIO],
           speechConfig: {
             voiceConfig: { prebuiltVoiceConfig: { voiceName } },
           },
@@ -1604,14 +1589,14 @@ async function startServer() {
               currentModelResponseText += modelText;
             }
 
-            // User input transcription (user speech text translated by Gemini)
+            // User input transcription (user speech text translated by Sarvam)
             const userTextOutput = (message.serverContent as any)?.userTurn?.parts?.[0]?.text;
             if (userTextOutput) {
               clientWs.send(JSON.stringify({ type: "transcription", role: "user", text: userTextOutput }));
               dialogueHistory.push({ role: "user", text: userTextOutput });
             }
 
-            // Function Calls (Gemini requesting server/client tool execution)
+            // Function Calls (Sarvam requesting server/client tool execution)
             if (message.toolCall?.functionCalls) {
               for (const fc of message.toolCall.functionCalls) {
                 const fnName = fc.name;
@@ -1767,21 +1752,21 @@ async function startServer() {
             }
           },
           onclose: (e: any) => {
-            console.log(`Gemini Live session closed (code=${e?.code}, reason=${e?.reason || "none"}, wasClean=${e?.wasClean})`);
+            console.log(`Sarvam session closed (code=${e?.code}, reason=${e?.reason || "none"}, wasClean=${e?.wasClean})`);
             clientWs.send(JSON.stringify({ type: "status", status: "session_closed" }));
           },
           onerror: (error: any) => {
-            console.error("[Gemini Live Error]:", error);
+            console.error("[Sarvam Error]:", error);
             clientWs.send(JSON.stringify({ 
               type: "error", 
-              error: `Gemini API Error: ${error?.message || String(error)}` 
+              error: `Sarvam API Error: ${error?.message || String(error)}` 
             }));
           }
         }
       });
       
       clientWs.send(JSON.stringify({ type: "status", status: "connected" }));
-      console.log("[Gemini Connect] Session established successfully");
+      console.log("[Sarvam Connect] Session established successfully");
       
       clientWs.on("message", (rawMsg) => {
         try {
@@ -1811,7 +1796,7 @@ async function startServer() {
       });
       
       clientWs.on("close", () => {
-        console.log("Client disconnected, closing Gemini session");
+        console.log("Client disconnected, closing Sarvam session");
         connectedClients.delete(clientWs);
         try {
           session.close();
@@ -1819,10 +1804,10 @@ async function startServer() {
       });
       
     } catch (err: any) {
-      console.error("Error connecting to Gemini Live API:", err);
+      console.error("Error connecting to Sarvam:", err);
       clientWs.send(JSON.stringify({ 
         type: "error", 
-        error: `Could not connect to Gemini: ${err.message || err}` 
+        error: `Could not connect to Sarvam: ${err.message || err}` 
       }));
       clientWs.close();
     }

@@ -8,7 +8,7 @@
  * writable folder under %APPDATA%\ELYSIA, because the install directory
  * (Program Files) is read-only.
  *
- * The Gemini API key is NOT shipped with the app. Each user supplies their own
+ * The Sarvam API key is NOT shipped with the app. Each user supplies their own
  * on first run; it is stored here in the per-user data dir (never returned to
  * the frontend).
  */
@@ -31,12 +31,12 @@ export function dataFile(name: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Gemini API key store (secrets.json in the data dir).
+// Sarvam API key store (secrets.json in the data dir).
 // ---------------------------------------------------------------------------
 const SECRETS_FILE = dataFile("secrets.json");
 
 interface Secrets {
-  geminiApiKey?: string;
+  sarvamApiKey?: string;
 }
 
 function readSecrets(): Secrets {
@@ -51,23 +51,23 @@ function readSecrets(): Secrets {
 }
 
 /**
- * Resolve the active Gemini API key from environment (.env).
+ * Resolve the active Sarvam API key from environment (.env).
  */
-export function getGeminiApiKey(): string | undefined {
-  return process.env.GEMINI_API_KEY?.trim() || undefined;
+export function getSarvamApiKey(): string | undefined {
+  return process.env.SARVAM_API_KEY?.trim() || readSecrets().sarvamApiKey || undefined;
 }
 
 /** Whether any usable key is configured (without revealing it). */
-export function hasGeminiApiKey(): boolean {
-  return Boolean(getGeminiApiKey());
+export function hasSarvamApiKey(): boolean {
+  return Boolean(getSarvamApiKey());
 }
 
 /** Persist a user-supplied key to the per-user secrets file. */
-export function setGeminiApiKey(key: string): void {
+export function setSarvamApiKey(key: string): void {
   const trimmed = (key || "").trim();
   if (!trimmed) throw new Error("API key must not be empty.");
   const current = readSecrets();
-  current.geminiApiKey = trimmed;
+  current.sarvamApiKey = trimmed;
   fs.writeFileSync(SECRETS_FILE, JSON.stringify(current, null, 2), "utf-8");
   try {
     fs.chmodSync(SECRETS_FILE, 0o600); // owner-only where supported
@@ -77,9 +77,9 @@ export function setGeminiApiKey(key: string): void {
 }
 
 /** Remove the stored key (used by "reset"/sign-out flows). */
-export function clearGeminiApiKey(): void {
+export function clearSarvamApiKey(): void {
   const current = readSecrets();
-  delete current.geminiApiKey;
+  delete current.sarvamApiKey;
   try {
     fs.writeFileSync(SECRETS_FILE, JSON.stringify(current, null, 2), "utf-8");
   } catch {

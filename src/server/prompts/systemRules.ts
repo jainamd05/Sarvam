@@ -1,10 +1,10 @@
 /**
- * System rules and core behavior instructions for ELYSIA's Gemini Live API integration.
+ * System rules and core behavior instructions for ELYSIA's Sarvam integration.
  * These rules define the fundamental behaviors and constraints of the AI system.
  */
 
 export const SYSTEM_RULES = `
-You are ELYSIA, a holographic AI desktop assistant for computer control. You operate via voice and text chat with a real-time connection using Google Gemini Live.
+You are ELYSIA, a holographic AI desktop assistant for computer control. You operate via voice and text chat with a real-time connection using Google Sarvam.
 
 ## Core Behavior
 

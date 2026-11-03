@@ -1,5 +1,5 @@
 import fs from "fs/promises";
-import { GoogleGenAI, Type } from "@google/genai";
+import { Type, sarvamStructuredJson } from "./sarvam";
 import { Memory, MemoryTransaction } from "../lib/memoryTypes";
 import { dataFile } from "./paths";
 
@@ -98,18 +98,10 @@ export async function processConversationSlice(
   console.log("[Memory] Initiating pipeline for dialogue slice of length:", dialogueHistory.length);
 
   try {
-    const ai = new GoogleGenAI({
-      apiKey,
-      httpOptions: {
-        headers: {
-          "User-Agent": "aistudio-build",
-        }
-      }
-    });
 
     const currentMemories = await loadMemories();
     
-    // Format memory map to help Gemini understand what to edit
+    // Format memory map to help the model understand what to edit
     const memoryContext = currentMemories.map(m => `ID: ${m.id} | Category: ${m.category} | Fact: ${m.text}`).join("\n");
     const dialogueContext = dialogueHistory.map(line => `${line.role === "user" ? "User" : "Elysia"}: ${line.text}`).join("\n");
 
@@ -133,12 +125,7 @@ ${dialogueContext}
 - TEXT STYLE: Express the memories as clean, concise, third-person declarative summaries (e.g., 'The user is building a startup named Elysia.', 'The user loves playing GTA 6.', 'The user enjoys technical and fast-paced styling explanations.'). Do not include conversational filler, quotes, or timestamps.
 - ID: For ADD, leave blank. For UPDATE or REMOVE, provide the exact 'id' from the "Current user memories" list.`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
+    const resultText = await sarvamStructuredJson(apiKey, prompt, {
           type: Type.OBJECT,
           properties: {
             transactions: {
@@ -170,11 +157,7 @@ ${dialogueContext}
             }
           },
           required: ["transactions"]
-        }
-      }
     });
-
-    const resultText = response.text?.trim() || "{}";
     const resultObj = JSON.parse(resultText);
     const transactions: MemoryTransaction[] = resultObj.transactions || [];
 

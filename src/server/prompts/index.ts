@@ -1,5 +1,5 @@
 /**
- * Aggregates all system prompts for Gemini Live API.
+ * Aggregates all system prompts for Sarvam.
  * This is the central location for system instruction assembly.
  */
 
@@ -10,11 +10,11 @@ import { MEMORY_SYSTEM_PROMPT } from "./memoryPrompts";
 import { buildPersonalityOverride, PROACTIVE_BEHAVIOR } from "./personalityOverrides";
 
 /**
- * Builds the complete system instruction string for Gemini Live.
+ * Builds the complete system instruction string for Sarvam.
  * 
  * @param avatarStyle - "orb" for AEGIS_CORE or "character" for ELYSIA_CORE
  * @param memoryContext - Optional user memory/context to include
- * @returns Complete system instruction string ready for Gemini Live API
+ * @returns Complete system instruction string ready for Sarvam
  */
 export function buildSystemInstruction(
   avatarStyle: string = "character",
